@@ -27,7 +27,7 @@ def lookup_ip(ip: str) -> Optional[str]:
             country = data.get("country_name")
             _cache[ip] = country
             return country
-    except (urllib.error.URLError, json.JSONDecodeError, KeyError, OSError):
+    except Exception:
         _cache[ip] = None
         return None
 
