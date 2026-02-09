@@ -1,13 +1,12 @@
 """Analyze parsed log entries and compute statistics."""
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 from logpulse.models import LogEntry
 from typing import List, Dict, Any
 
 
 def _extract_hour(timestamp: str) -> str:
     """Extract hour string from various timestamp formats."""
-    # Apache: 15/Jan/2024:10:15:30 +0000
     m = re.search(r"(\d{2}):\d{2}:\d{2}", timestamp)
     if m:
         return f"{m.group(1)}:00"
@@ -21,10 +20,13 @@ def analyze(entries: List[LogEntry], top_n: int = 10) -> Dict[str, Any]:
     statuses = Counter(e.status for e in entries)
     methods = Counter(e.method for e in entries)
     total_bytes = sum(e.size for e in entries)
-
-    # Hourly traffic distribution
     hours = Counter(_extract_hour(e.timestamp) for e in entries)
     hourly_traffic = sorted(hours.items())
+
+    # Error analysis
+    errors = [e for e in entries if e.status >= 400]
+    error_rate = len(errors) / total * 100 if total else 0
+    error_urls = Counter(e.url for e in errors).most_common(top_n)
 
     return {
         "total_requests": total,
@@ -35,4 +37,7 @@ def analyze(entries: List[LogEntry], top_n: int = 10) -> Dict[str, Any]:
         "status_codes": sorted(statuses.items()),
         "methods": sorted(methods.items()),
         "hourly_traffic": hourly_traffic,
+        "error_rate": round(error_rate, 1),
+        "error_count": len(errors),
+        "error_urls": error_urls,
     }

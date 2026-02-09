@@ -10,7 +10,8 @@ from logpulse.reporter import report
 @click.argument("logfile", type=click.Path(exists=True), default="-")
 @click.option("--format", "fmt", type=click.Choice(["table", "json"]), default="table", help="Output format")
 @click.option("--top", "top_n", default=10, help="Number of top entries to show")
-def main(logfile, fmt, top_n):
+@click.option("--errors-only", is_flag=True, help="Show only error analysis (4xx/5xx)")
+def main(logfile, fmt, top_n, errors_only):
     """Analyze log files and generate summary reports."""
     if logfile == "-":
         lines = sys.stdin.read().splitlines()
@@ -28,7 +29,7 @@ def main(logfile, fmt, top_n):
         raise SystemExit(1)
 
     stats = analyze(entries, top_n=top_n)
-    output = report(stats, fmt=fmt)
+    output = report(stats, fmt=fmt, errors_only=errors_only)
     click.echo(output)
 
 
