@@ -36,7 +36,7 @@ def test_parse_json_valid():
 
 def test_parse_json_invalid():
     assert parse_json_log("not json") is None
-    assert parse_json_log("{}") is None  # missing required fields
+    assert parse_json_log("{}") is None
 
 
 def test_detect_apache():
