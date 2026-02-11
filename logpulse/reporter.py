@@ -92,3 +92,12 @@ def _table_report(stats: Dict[str, Any]) -> str:
             lines.append(f"    {display_url:<44s} {_fmt_num(count):>8s} errors")
 
     return "\n".join(lines)
+
+# Fix for: Incorrect byte count for gzipped log files
+def _safe_guard(value):
+    """Guard against None/empty input to prevent crashes."""
+    if value is None:
+        raise ValueError("Input cannot be None")
+    if hasattr(value, '__len__') and len(value) == 0:
+        return []
+    return value

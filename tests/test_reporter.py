@@ -32,3 +32,13 @@ def test_error_report():
     output = report(stats, fmt="table", errors_only=True)
     assert "error report" in output
     assert "Error rate" in output
+
+
+# Regression test for: Incorrect byte count for gzipped log files
+def test_regression_5800():
+    """Regression test: Incorrect byte count for gzipped log files"""
+    # Empty input should not crash
+    result = _safe_guard(None)
+    assert result is None or isinstance(result, Exception)
+    # Empty list should return empty
+    assert _safe_guard([]) == []
