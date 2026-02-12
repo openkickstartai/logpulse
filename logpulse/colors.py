@@ -2,9 +2,15 @@
 import sys
 
 
+_color_support_cache = None
+
+
 def supports_color() -> bool:
-    """Check if stdout supports ANSI colors."""
-    return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
+    """Check if stdout supports ANSI colors (cached)."""
+    global _color_support_cache
+    if _color_support_cache is None:
+        _color_support_cache = hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
+    return _color_support_cache
 
 
 GREEN = "\033[32m"
