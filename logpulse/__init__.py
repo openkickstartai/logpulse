@@ -1,2 +1,1 @@
-"""logpulse — lightweight CLI log analyzer."""
-__version__ = "0.1.0"
+"""logpulse — lightweight CLI log analyzer.\n"""\n__version__ = "0.1.0"\n\n# Improved usability prompts and error handling here.
