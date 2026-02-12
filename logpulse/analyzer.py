@@ -1,4 +1,4 @@
-"""Analyze parsed log entries and compute statistics."""
+"""Analyze parsed log entries and compute statistics."
 import re
 from collections import Counter
 from logpulse.models import LogEntry
@@ -6,7 +6,7 @@ from typing import List, Dict, Any
 
 
 def _extract_hour(timestamp: str) -> str:
-    """Extract hour string from various timestamp formats."""
+    """Extract hour string from various timestamp formats."
     m = re.search(r"(\d{2}):\d{2}:\d{2}", timestamp)
     if m:
         return f"{m.group(1)}:00"
