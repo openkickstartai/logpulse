@@ -1,16 +1,12 @@
 """ANSI color utilities for terminal output."""
 import sys
+from functools import lru_cache
 
 
-_color_support_cache = None
-
-
+@lru_cache(maxsize=1)
 def supports_color() -> bool:
     """Check if stdout supports ANSI colors (cached)."""
-    global _color_support_cache
-    if _color_support_cache is None:
-        _color_support_cache = hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
-    return _color_support_cache
+    return hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
 
 
 GREEN = "\033[32m"
@@ -27,8 +23,9 @@ def colorize(text: str, color: str) -> str:
     return f"{color}{text}{RESET}"
 
 
+@lru_cache(maxsize=128)
 def status_color(code: int) -> str:
-    """Return appropriate color for HTTP status code."""
+    """Return appropriate color for HTTP status code (cached)."""
     if code < 300:
         return GREEN
     elif code < 400:
