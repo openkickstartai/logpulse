@@ -5,7 +5,6 @@ from logpulse.parsers import detect_and_parse
 from logpulse.analyzer import analyze
 from logpulse.reporter import report
 
-
 @click.command()
 @click.argument("logfile", type=click.Path(exists=True), default="-")
 @click.option("--format", "fmt", type=click.Choice(["table", "json"]), default="table", help="Output format")
@@ -21,7 +20,7 @@ def main(logfile, fmt, top_n, errors_only, geo):
             lines = f.read().splitlines()
 
     if not lines:
-        click.echo("No log lines found.", err=True)
+        click.echo("No log lines found. Please provide a valid log file.", err=True)
         raise SystemExit(1)
 
     entries = detect_and_parse(lines)
@@ -37,7 +36,6 @@ def main(logfile, fmt, top_n, errors_only, geo):
 
     output = report(stats, fmt=fmt, errors_only=errors_only)
     click.echo(output)
-
 
 if __name__ == "__main__":
     main()
