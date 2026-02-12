@@ -1,2 +1,1 @@
-"""logpulse — lightweight CLI log analyzer."""
-__version__ = "0.1.0"
+"""logpulse — lightweight CLI log analyzer.\n"""\n__version__ = "0.1.1"\n# Added user-friendly error messages and improved initialization process.
