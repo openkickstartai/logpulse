@@ -24,8 +24,10 @@ def analyze(entries: List[LogEntry], top_n: int = 10) -> Dict[str, Any]:
     hourly_traffic = sorted(hours.items())
 
     # Error analysis
-    errors = [e for e in entries if e.status >= 400]
-    error_rate = round(len(errors) / total * 100, 1) if total else 0
+        errors = [e for e in entries if e.status >= 400]
+        warnings = [e for e in entries if 300 <= e.status < 400]
+        error_rate = round(len(errors) / total * 100, 1) if total else 0
+        warning_rate = round(len(warnings) / total * 100, 1) if total else 0
     error_urls = Counter(e.url for e in errors).most_common(top_n)
 
     return {
@@ -35,9 +37,11 @@ def analyze(entries: List[LogEntry], top_n: int = 10) -> Dict[str, Any]:
         "top_ips": ips.most_common(top_n),
         "top_urls": urls.most_common(top_n),
         "status_codes": sorted(statuses.items()),
-        "methods": sorted(methods.items()),
-        "hourly_traffic": hourly_traffic,
-        "error_rate": error_rate,
+            "error_rate": error_rate,
+            "warning_rate": warning_rate,
+            "error_count": len(errors),
+            "warning_count": len(warnings),
+            "error_urls": error_urls,
         "error_count": len(errors),
         "error_urls": error_urls,
     }
