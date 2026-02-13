@@ -18,7 +18,8 @@ def main(logfile, fmt, top_n, errors_only, geo):
         lines = sys.stdin.read().splitlines()
     else:
         with open(logfile) as f:
-            lines = f.read().splitlines()
+            lines = [line.rstrip('\n') for line in f]
+
 
     if not lines:
         click.echo("No log lines found.", err=True)

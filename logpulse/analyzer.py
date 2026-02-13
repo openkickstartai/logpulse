@@ -2,7 +2,8 @@
 import re
 from collections import Counter
 from logpulse.models import LogEntry
-from typing import List, Dict, Any
+from typing import Iterable, Dict, Any
+
 
 
 def _extract_hour(timestamp: str) -> str:
@@ -12,21 +13,37 @@ def _extract_hour(timestamp: str) -> str:
         return f"{m.group(1)}:00"
     return "unknown"
 
+def analyze(entries: Iterable[LogEntry], top_n: int = 10) -> Dict[str, Any]:
+    """Single-pass analysis over log entries.
 
-def analyze(entries: List[LogEntry], top_n: int = 10) -> Dict[str, Any]:
-    total = len(entries)
-    ips = Counter(e.ip for e in entries)
-    urls = Counter(e.url for e in entries)
-    statuses = Counter(e.status for e in entries)
-    methods = Counter(e.method for e in entries)
-    total_bytes = sum(e.size for e in entries)
-    hours = Counter(_extract_hour(e.timestamp) for e in entries)
+    Accepts any Iterable (including generators), so callers can
+    stream entries without buffering the full list in memory.
+    Previous impl did 7+ full passes; this does exactly 1.
+    """
+    ips: Counter = Counter()
+    urls: Counter = Counter()
+    statuses: Counter = Counter()
+    methods: Counter = Counter()
+    hours: Counter = Counter()
+    error_urls: Counter = Counter()
+    total = 0
+    total_bytes = 0
+    error_count = 0
+
+    for e in entries:
+        total += 1
+        ips[e.ip] += 1
+        urls[e.url] += 1
+        statuses[e.status] += 1
+        methods[e.method] += 1
+        total_bytes += e.size
+        hours[_extract_hour(e.timestamp)] += 1
+        if e.status >= 400:
+            error_count += 1
+            error_urls[e.url] += 1
+
     hourly_traffic = sorted(hours.items())
-
-    # Error analysis
-    errors = [e for e in entries if e.status >= 400]
-    error_rate = round(len(errors) / total * 100, 1) if total else 0
-    error_urls = Counter(e.url for e in errors).most_common(top_n)
+    error_rate = round(error_count / total * 100, 1) if total else 0
 
     return {
         "total_requests": total,
@@ -38,6 +55,8 @@ def analyze(entries: List[LogEntry], top_n: int = 10) -> Dict[str, Any]:
         "methods": sorted(methods.items()),
         "hourly_traffic": hourly_traffic,
         "error_rate": error_rate,
-        "error_count": len(errors),
-        "error_urls": error_urls,
+        "error_count": error_count,
+        "error_urls": error_urls.most_common(top_n),
+    }
+
     }
