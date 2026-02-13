@@ -9,7 +9,7 @@ from logpulse.reporter import report
 @click.command()
 @click.argument("logfile", type=click.Path(exists=True), default="-")
 @click.option("--format", "fmt", type=click.Choice(["table", "json"]), default="table", help="Output format")
-@click.option("--top", "top_n", default=10, help="Number of top entries to show")
+@click.option("--top", "top_n", default=10, type=click.IntRange(1, 1000), help="Number of top entries to show (1-1000)")
 @click.option("--errors-only", is_flag=True, help="Show only error analysis (4xx/5xx)")
 @click.option("--geo", is_flag=True, help="Resolve top IPs to country (uses ipapi.co)")
 def main(logfile, fmt, top_n, errors_only, geo):
